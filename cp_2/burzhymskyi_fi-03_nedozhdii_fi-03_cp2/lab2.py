@@ -1,5 +1,6 @@
 import numpy as np
 
+import numpy as np
 alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 
 def redact_text():
@@ -12,19 +13,8 @@ def redact_text():
             if letter >= 'а' and letter <= 'я':
                 new_line += letter
         text += new_line
-
     with open('balobol_clean.txt', 'w', encoding="utf8") as f:
         f.write(text)
-
-with open('balobol_clean.txt', 'r', encoding="utf8") as f:
-    text = f.read()
-
-
-key_2 = "ру"
-key_3 = "чвк"
-key_4 = "груз"
-key_5 = "гойда"
-key_12 = "генацидрусни"
 
 def encode(text, key):
     code = ""
@@ -33,7 +23,6 @@ def encode(text, key):
         code += letter
     with open('balobol_encoded_12.txt', 'w', encoding="utf8") as f:
         f.write(code)
-
     return code
 
 def decode(code,key):
@@ -41,7 +30,6 @@ def decode(code,key):
     for i in range(len(code)):
         letter = alphabet[(alphabet.index(code[i]) - alphabet.index(key[i % (len(key))])) % len(alphabet)]
         text += letter
-
     return text
 
 def N(Y,t):
@@ -60,14 +48,6 @@ def IoC(Y):
     k = float(k / (n * (n - 1)))
     return k
 
-print(IoC(text))
-print(IoC(encode(text,key_2)))
-print(IoC(encode(text,key_3)))
-print(IoC(encode(text,key_4)))
-print(IoC(encode(text,key_5)))
-print(IoC(encode(text,key_12)))
-
-
 def lenKey(Y):
     n = len(Y)
     D = []
@@ -76,17 +56,66 @@ def lenKey(Y):
         for i in range(0, n-r):
             if(Y[i] == Y[i+r]):
                 D[r-6] += 1
-    print(D)
     return D.index(max(D))+6
 
-key_10 = "генацидрус"
-print(lenKey(encode(text,key_10)))
+def splitCodeOnFragments(code, r):
+    Y = np.full(r, "", dtype='object')
+    j = 0
+    for i in range(0,r):
+        Y[i] = ""
+
+    for i in range(0, len(code)):
+        if i % r == 0:
+            j += r
+        Y[i-j] += code[i]
+    return Y
+
+
+def frequencyInFragment(Y):
+    p = {'а': 0, 'б': 0, 'в': 0, 'г': 0, 'д': 0, 'е': 0,
+     'ж': 0, 'з': 0, 'и': 0, 'й': 0, 'к': 0, 'л': 0,
+     'м': 0, 'н': 0, 'о': 0, 'п': 0, 'р': 0, 'с': 0,
+     'т': 0, 'у': 0, 'ф': 0, 'х': 0, 'ц': 0, 'ч': 0,
+     'ш': 0, 'щ': 0, 'ъ': 0, 'ы': 0, 'ь': 0, 'э': 0,
+     'ю': 0, 'я': 0}
+    for letter in Y:
+        p[letter] += 1
+    return dict(sorted(p.items(), key=lambda item: item[1], reverse=True))
+
+def findPossibleKey(blocks, p):
+    p = dict(sorted(p.items(), key=lambda item: item[1], reverse=True))
+    keys = []
+    result = ""
+    for i in range(len(blocks)):
+        block = frequencyInFragment(blocks[i])
+        key = ""
+        for j in range(len(blocks)):
+            key += (alphabet[(alphabet.index(list(block)[0]) - alphabet.index(list(p)[j])) % len(alphabet)])
+        keys.append(key)
+        result += keys[i][0]
+    return result
+
+with open('balobol_clean.txt', 'r', encoding="utf8") as f:
+    our_text = f.read()
+
+key_2 = "ру"
+key_3 = "чвк"
+key_4 = "груз"
+key_5 = "гойда"
+key_12 = "генацидрусни"
+
+print(IoC(our_text))
+print(IoC(encode(our_text,key_2)))
+print(IoC(encode(our_text,key_3)))
+print(IoC(encode(our_text,key_4)))
+print(IoC(encode(our_text,key_5)))
+print(IoC(encode(our_text,key_12)))
+
 
 with open('labtext_encoded', 'r', encoding="utf8") as f:
     text = f.read()
 
-print(lenKey(text))
-
+r = lenKey(text)
 
 p = {'а': 0.0837222, 'б': 0.0168792, 'в': 0.0439467, 'г': 0.0181161, 'д': 0.031353, 'е': 0.0863102,
      'ж': 0.0122626, 'з': 0.0159467, 'и': 0.0609324, 'й': 0.0106413, 'к': 0.0358363, 'л': 0.0479277,
@@ -127,5 +156,11 @@ def key(code, r, p):
     print(key)
 
 key(text, lenKey(text), p)
+
+Yi = splitCodeOnFragments(text, r)
+
+result = findPossibleKey(Yi, p)
+
+print(result)
 
 
