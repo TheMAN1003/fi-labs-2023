@@ -1,3 +1,5 @@
+import numpy as np
+
 alphabet = "абвгдежзийклмнопрстуфхцчшщъыьэюя"
 
 def redact_text():
@@ -93,5 +95,37 @@ p = {'а': 0.0837222, 'б': 0.0168792, 'в': 0.0439467, 'г': 0.0181161, 'д': 0
      'ш': 0.0076803, 'щ': 0.00312845, 'ъ': 0.000216936, 'ы': 0.0175642, 'ь': 0.0208754, 'э': 0.00356613,
      'ю': 0.00785918, 'я': 0.021941}
 
+def splitCodeOnBlocks(code, r):
+    Y = np.full(r, "", dtype='object')
+    j = 0
+    for i in range(0, len(code)):
+        if i % r == 0:
+            j += r
+        Y[i-j] += code[i]
+    return Y.tolist()
+
+def M_i(Y, g, p):
+    k = 0
+    for t in range(0,len(alphabet)):
+        pr = p[alphabet[t]]
+        nt = N(Y, alphabet[(t + g) % len(alphabet)])
+        k += ( pr*nt )
+    return k
+
+def key(code, r, p):
+    Y = splitCodeOnBlocks(code,r)
+    key = ""
+    for y_i in Y:
+        maxF = 0
+        maxG = 0
+        for g in range(0,len(alphabet)):
+            tmp = M_i(y_i, g, p)
+            if tmp > maxF:
+                maxF = tmp
+                maxG = g
+        key += alphabet[maxG]
+    print(key)
+
+key(text, lenKey(text), p)
 
 
