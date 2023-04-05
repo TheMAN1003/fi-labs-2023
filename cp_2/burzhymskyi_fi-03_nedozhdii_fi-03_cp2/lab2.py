@@ -69,15 +69,16 @@ print(IoC(encode(text,key_12)))
 def lenKey(Y):
     n = len(Y)
     D = []
-    for r in range(6, n):
+    for r in range(6, 31):
         D.append(0)
-        if n % r == 0:
-            for i in range(0, n-r):
-                if(Y[i] == Y[i+r]):
-                    D[r-6] += 1
+        for i in range(0, n-r):
+            if(Y[i] == Y[i+r]):
+                D[r-6] += 1
     print(D)
     return D.index(max(D))+6
 
+key_10 = "генацидрус"
+print(lenKey(encode(text,key_10)))
 
 with open('labtext_encoded', 'r', encoding="utf8") as f:
     text = f.read()
@@ -91,11 +92,6 @@ p = {'а': 0.0837222, 'б': 0.0168792, 'в': 0.0439467, 'г': 0.0181161, 'д': 0
      'т': 0.063589, 'у': 0.0280076, 'ф': 0.00373739, 'х': 0.00672502, 'ц': 0.00317793, 'ч': 0.0152578,
      'ш': 0.0076803, 'щ': 0.00312845, 'ъ': 0.000216936, 'ы': 0.0175642, 'ь': 0.0208754, 'э': 0.00356613,
      'ю': 0.00785918, 'я': 0.021941}
-
-
-
-
-
 
 
 
