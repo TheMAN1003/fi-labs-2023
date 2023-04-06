@@ -21,8 +21,6 @@ def encode(text, key):
     for i in range(len(text)):
         letter = alphabet[(alphabet.index(text[i]) + alphabet.index(key[i % (len(key))])) % len(alphabet)]
         code += letter
-    with open('balobol_encoded_12.txt', 'w', encoding="utf8") as f:
-        f.write(code)
     return code
 
 def decode(code,key):
@@ -51,11 +49,18 @@ def IoC(Y):
 def lenKey(Y):
     n = len(Y)
     D = []
+    deltaD = []
     for r in range(6, 31):
         D.append(0)
         for i in range(0, n-r):
             if(Y[i] == Y[i+r]):
                 D[r-6] += 1
+
+    deltaD.append(abs(D[0] - D[1]))
+    for r in range(7,30):
+        deltaD.append(max((D[r - 6] - D[r - 6 - 1]), (D[r - 6] - D[r - 6 + 1])))
+    deltaD.append(abs(D[30 - 6] - D[30 - 6 - 1]))
+
     return D.index(max(D))+6
 
 def splitCodeOnFragments(code, r):
@@ -95,35 +100,6 @@ def findPossibleKey(blocks, p):
         result += keys[i][0]
     return result
 
-with open('balobol_clean.txt', 'r', encoding="utf8") as f:
-    our_text = f.read()
-
-key_2 = "ру"
-key_3 = "чвк"
-key_4 = "груз"
-key_5 = "гойда"
-key_12 = "генацидрусни"
-
-print(IoC(our_text))
-print(IoC(encode(our_text,key_2)))
-print(IoC(encode(our_text,key_3)))
-print(IoC(encode(our_text,key_4)))
-print(IoC(encode(our_text,key_5)))
-print(IoC(encode(our_text,key_12)))
-
-
-with open('labtext_encoded', 'r', encoding="utf8") as f:
-    text = f.read()
-
-r = lenKey(text)
-
-p = {'а': 0.0837222, 'б': 0.0168792, 'в': 0.0439467, 'г': 0.0181161, 'д': 0.031353, 'е': 0.0863102,
-     'ж': 0.0122626, 'з': 0.0159467, 'и': 0.0609324, 'й': 0.0106413, 'к': 0.0358363, 'л': 0.0479277,
-     'м': 0.0321066, 'н': 0.0644872, 'о': 0.11294, 'п': 0.0280266, 'р': 0.0425652, 'с': 0.0526736,
-     'т': 0.063589, 'у': 0.0280076, 'ф': 0.00373739, 'х': 0.00672502, 'ц': 0.00317793, 'ч': 0.0152578,
-     'ш': 0.0076803, 'щ': 0.00312845, 'ъ': 0.000216936, 'ы': 0.0175642, 'ь': 0.0208754, 'э': 0.00356613,
-     'ю': 0.00785918, 'я': 0.021941}
-
 def splitCodeOnBlocks(code, r):
     Y = np.full(r, "", dtype='object')
     j = 0
@@ -153,14 +129,52 @@ def key(code, r, p):
                 maxF = tmp
                 maxG = g
         key += alphabet[maxG]
-    print(key)
+    return key
 
-key(text, lenKey(text), p)
+
+with open('balobol_clean.txt', 'r', encoding="utf8") as f:
+    our_text = f.read()
+
+key_2 = "ру"
+key_3 = "чвк"
+key_4 = "груз"
+key_5 = "гойда"
+key_12 = "генацидрусни"
+
+print(IoC(our_text))
+print(IoC(encode(our_text,key_2)))
+print(IoC(encode(our_text,key_3)))
+print(IoC(encode(our_text,key_4)))
+print(IoC(encode(our_text,key_5)))
+print(IoC(encode(our_text,key_12)))
+
+
+with open('labtext_encoded', 'r', encoding="utf8") as f:
+    text = f.read()
+
+r = lenKey(text)
+
+p = {'а': 0.0837222, 'б': 0.0168792, 'в': 0.0439467, 'г': 0.0181161, 'д': 0.031353, 'е': 0.0863102,
+     'ж': 0.0122626, 'з': 0.0159467, 'и': 0.0609324, 'й': 0.0106413, 'к': 0.0358363, 'л': 0.0479277,
+     'м': 0.0321066, 'н': 0.0644872, 'о': 0.11294, 'п': 0.0280266, 'р': 0.0425652, 'с': 0.0526736,
+     'т': 0.063589, 'у': 0.0280076, 'ф': 0.00373739, 'х': 0.00672502, 'ц': 0.00317793, 'ч': 0.0152578,
+     'ш': 0.0076803, 'щ': 0.00312845, 'ъ': 0.000216936, 'ы': 0.0175642, 'ь': 0.0208754, 'э': 0.00356613,
+     'ю': 0.00785918, 'я': 0.021941}
+
+
+keyword = key(text, r, p)
+print(keyword)
 
 Yi = splitCodeOnFragments(text, r)
-
 result = findPossibleKey(Yi, p)
-
 print(result)
 
+realkey = "экомаятникфуко"
+
+print(decode(text, keyword))
+print(decode(text, result))
+print(decode(text, realkey))
+
+print(IoC(text))
+print(IoC(decode(text, realkey)))
 
