@@ -5,6 +5,7 @@
 #include <map>
 #include <wchar.h>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 
@@ -62,13 +63,15 @@ void H1(const wstring& text)
     wcout<<'\n';
     for (auto c : text)
     {
-        if(c != L' ')
-            ++gram[c];
+        ++gram[c];
     }
     long long sum = 0;
     for (const auto& [key, value] : gram) {
         std::wcout << key << ": " << value << std::endl;
         sum+=value;
+    }
+    for (const auto& [key, value] : gram) {
+        std::wcout <<"\'"<< key << "\'& " << (double)value/(double)sum<<" & " ;
     }
     wcout<<'\n';
     double h1 = 0;
@@ -80,6 +83,7 @@ void H1(const wstring& text)
     wcout<<"H1 = "<<h1;
     wcout<<'\n';
 }
+
 
 wstring clearSpaces(const wstring& text)
 {
@@ -94,30 +98,18 @@ wstring clearSpaces(const wstring& text)
 }
 
 
-void H2(const wstring& text,const wstring& textWithoutSpaces)
+void printBigramFreq(map<wstring, int> bigram)
 {
-    map<wstring, int> bigram;
-    map<wstring, int> bigramWithoutSpaces;
-    wcout<<'\n';
-    wcout<<L"Біграми з перетином літер:\n";
-    for(int i = 0; i < text.size() - 1; ++i)
-    {
-        if(text[i] != L' ' && text[i+1]!=L' ')
-        {
-            wchar_t* a = new wchar_t(text[i]);
-            wchar_t* b = new wchar_t (text[i+1]);
-            wstring tmp = static_cast<wstring>(a)+ static_cast<wstring>(b);
-            bigram[tmp]++;
-            delete a;
-            delete b;
-        }
-    }
-    wcout<<'\n';
+    std::wcout<<bigram.size()-1<<'\n';
     long long sum = 0;
     for (const auto& [key, value] : bigram) {
-        std::wcout << key << ": " << value << std::endl;
         sum+=value;
     }
+
+    for (const auto& [key, value] : bigram) {
+        std::wcout <<"\'"<< key<<"\'" << ":" <<std::setprecision(7)<<std::fixed<< (double)value/(double)sum << "\n";
+    }
+
 
     wcout<<'\n';
     double h2 = 0;
@@ -127,34 +119,96 @@ void H2(const wstring& text,const wstring& textWithoutSpaces)
     }
     h2 = (-1)*h2;
     wcout<<"H2 = "<<h2/2<<'\n';
+}
 
-    wcout<<L"Біграми без перетину літер:\n";
-    for(int i = 0; i < textWithoutSpaces.size() - 1; ++i)
+void H2(wstring text)
+{
+    map<wstring, int> bigram;
+    wcout<<'\n';
+    wcout<<L"Біграми з перетином літер з пробілом:\n";
+    for(int i = 0; i < text.size() - 1; ++i)
     {
-        wchar_t* a = new wchar_t(textWithoutSpaces[i]);
-        wchar_t* b = new wchar_t (textWithoutSpaces[i+1]);
+        wchar_t* a;
+        wchar_t* b;
+        if(text[i] == L' ')
+            a = new wchar_t('_');
+        else
+            a = new wchar_t(text[i]);
+        if(text[i+1] == L' ')
+            b = new wchar_t ('_');
+        else
+            b = new wchar_t (text[i+1]);
+
         wstring tmp = static_cast<wstring>(a)+ static_cast<wstring>(b);
-        bigramWithoutSpaces[tmp]++;
+        bigram[tmp]++;
         delete a;
         delete b;
     }
+    printBigramFreq(bigram);
+    wcout<<'\n';
 
-    wcout<<'\n';
-    sum = 0;
-    for (const auto& [key, value] : bigramWithoutSpaces) {
-        std::wcout << key << ": " << value << std::endl;
-        sum += value;
+
+    bigram.clear();
+    wcout<<L"Біграми без перетину літер з пробілами:\n";
+    for(int i = 0; i < text.size() - 1; i+=2)
+    {
+        wchar_t* a;
+        wchar_t* b;
+        if(text[i] == L' ')
+            a = new wchar_t('_');
+        else
+            a = new wchar_t(text[i]);
+        if(text[i+1] == L' ')
+            b = new wchar_t ('_');
+        else
+            b = new wchar_t (text[i+1]);
+        wstring tmp = static_cast<wstring>(a) + static_cast<wstring>(b);
+        bigram[tmp]++;
+        delete a;
+        delete b;
     }
+    printBigramFreq(bigram);
     wcout<<'\n';
-    h2 = 0;
-    for (const auto& [key, value] : bigramWithoutSpaces) {
-        double p = (double)value/(double)sum;
-        h2 += p*log2(p);
+
+
+    text = clearSpaces(text);
+
+    bigram.clear();
+    wcout<<L"Біграми з перетином літер без пробілів:\n";
+    for(int i = 0; i < text.size() - 1; ++i)
+    {
+        wchar_t* a = new wchar_t(text[i]);
+        wchar_t* b = new wchar_t (text[i+1]);
+        wstring tmp = static_cast<wstring>(a) + static_cast<wstring>(b);
+        bigram[tmp]++;
+        delete a;
+        delete b;
     }
-    h2 = (-1)*h2;
-    wcout<<"H2 = "<<h2/2<<'\n';
+    printBigramFreq(bigram);
+    wcout<<'\n';
+
+
+    bigram.clear();
+    wcout<<L"Біграми без перетину літер без пробілів:\n";
+    for(int i = 0; i < text.size() - 1; i+=2)
+    {
+        wchar_t* a = new wchar_t(text[i]);
+        wchar_t* b = new wchar_t (text[i+1]);
+        wstring tmp = static_cast<wstring>(a) + static_cast<wstring>(b);
+        bigram[tmp]++;
+        delete a;
+        delete b;
+    }
+    printBigramFreq(bigram);
+    wcout<<'\n';
+
+
+
+
 
 }
+
+
 
 
 
@@ -163,8 +217,10 @@ int main()
     setlocale(LC_ALL, "ru_RU.UTF-8");
 
     wstring cleaned = cleanText();
-    H1(cleaned);
-    H2(cleaned, clearSpaces(cleaned));
+    //H1(cleaned);
+    //H1(clearSpaces(cleaned));
+
+    H2(cleaned);
 
 
     return 0;
