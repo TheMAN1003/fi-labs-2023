@@ -1,10 +1,10 @@
-
 def extended_gcd(a, b):
     if b == 0:
-        return (a, 1, 0)
+        return a, 1, 0
     else:
         (d, x, y) = extended_gcd(b, a % b)
-        return (d, y, x - int(a/b) * y)
+        return d, y, x - int(a / b) * y
+
 
 def solve_linear_mod_equations(a, b, n):
     res = []
@@ -13,15 +13,35 @@ def solve_linear_mod_equations(a, b, n):
         res.append((x * b) % n)
     else:
         if b % d == 0:
-            (a, b, n) = (a/d, b/d, n/d)
+            (a, b, n) = (a / d, b / d, n / d)
             (_, x, y) = extended_gcd(a, n)
             x_0 = (x * b) % n
             for i in range(d):
-                res.append(int(x_0 + i*n))
+                res.append(int(x_0 + i * n))
     return res
 
-print(extended_gcd(2,33))
+
+alph = "абвгдежзийклмнопрстуфхцчшщыьэюя"
+alph1 = "абвгдежзийклмнопрстуфхцчшщьыэюя"
+
+M_bi = ["ен", "на", "то", "но", "ст"]
+C_test = ["ыя", "йз", "хф", "хр", "ыв"]
 
 
-print(solve_linear_mod_equations(8, 16, 32))
+def convert_bigrams(bigrams):
+    num1 = []
+    num2 = []
+    n = len(alph)
+    for i in bigrams:
+        num1.append(alph.index(i[0]) * n + alph1.index(i[1]))
+        num2.append(alph1.index(i[0]) * n + alph1.index(i[1]))
+    return num1, num2
 
+
+(m1, m2) = convert_bigrams(M_bi)
+
+print(m1,m2)
+
+(c1, c2) = convert_bigrams(C_test)
+
+print(c1,c2)
