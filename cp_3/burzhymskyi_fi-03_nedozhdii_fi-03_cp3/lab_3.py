@@ -21,27 +21,33 @@ def solve_linear_mod_equations(a, b, n):
     return res
 
 
-alph = "абвгдежзийклмнопрстуфхцчшщыьэюя"
-alph1 = "абвгдежзийклмнопрстуфхцчшщьыэюя"
+alph1 = "абвгдежзийклмнопрстуфхцчшщыьэюя"
+alph2 = "абвгдежзийклмнопрстуфхцчшщьыэюя"
 
 M_bi = ["ен", "на", "то", "но", "ст"]
 C_test = ["ыя", "йз", "хф", "хр", "ыв"]
 
 
-def convert_bigrams(bigrams):
-    num1 = []
-    num2 = []
-    n = len(alph)
-    for i in bigrams:
-        num1.append(alph.index(i[0]) * n + alph1.index(i[1]))
-        num2.append(alph1.index(i[0]) * n + alph1.index(i[1]))
-    return num1, num2
+def cb(bigram, alphabet):
+    n = len(alphabet)
+    number = alphabet.index(bigram[0]) * n + alphabet.index(bigram[1])
+    return number
+
+def splitOnPairs(list1, list2, alph):
+    listOfPairs = []
+    for indexX1 in range(len(list1)):
+        for indexY1 in range(len(list2)):
+            for indexX2 in range(len(list1)):
+                for indexY2 in range(len(list2)):
+                    if indexX1 != indexX2 and indexY1 != indexY2 and indexX2 < indexX1:
+                        listOfPairs.append([cb(list1[indexX1], alph), cb(list2[indexY1], alph), cb(list1[indexX2], alph), cb(list2[indexY2], alph)])
+    return listOfPairs
 
 
-(m1, m2) = convert_bigrams(M_bi)
+pairs1 = splitOnPairs(M_bi, C_test, alph1)
+print(pairs1)
+print(len(pairs1))
 
-print(m1,m2)
-
-(c1, c2) = convert_bigrams(C_test)
-
-print(c1,c2)
+pairs2 = splitOnPairs(M_bi, C_test, alph2)
+print(pairs2)
+print(len(pairs2))
