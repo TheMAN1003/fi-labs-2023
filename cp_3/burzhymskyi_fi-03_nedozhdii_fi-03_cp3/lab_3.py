@@ -33,6 +33,7 @@ def cb(bigram, alphabet):
     number = alphabet.index(bigram[0]) * n + alphabet.index(bigram[1])
     return number
 
+
 def splitOnPairs(list1, list2, alph):
     listOfPairs = []
     for indexX1 in range(len(list1)):
@@ -40,8 +41,25 @@ def splitOnPairs(list1, list2, alph):
             for indexX2 in range(len(list1)):
                 for indexY2 in range(len(list2)):
                     if indexX1 != indexX2 and indexY1 != indexY2 and indexX2 < indexX1:
-                        listOfPairs.append([cb(list1[indexX1], alph), cb(list2[indexY1], alph), cb(list1[indexX2], alph), cb(list2[indexY2], alph)])
+                        listOfPairs.append(
+                            [cb(list1[indexX1], alph), cb(list2[indexY1], alph), cb(list1[indexX2], alph),
+                             cb(list2[indexY2], alph)])
     return listOfPairs
+
+
+def solve_system(x1, x2, y1, y2, mod):
+    (_, r, _) = extended_gcd(x1 - x2, mod)
+    a = (r * (y1 - y2)) % mod
+    b = (y1 - a * x1) % mod
+    return a, b
+
+
+def keys(pairs):
+    key = []
+    mod = len(alph1) ** 2
+    for p in pairs:
+        key.append(solve_system(p[0], p[1], p[2], p[3], mod))
+    return key
 
 
 pairs1 = splitOnPairs(M_bi, C_test, alph1)
@@ -51,3 +69,6 @@ print(len(pairs1))
 pairs2 = splitOnPairs(M_bi, C_test, alph2)
 print(pairs2)
 print(len(pairs2))
+
+print(keys(pairs1))
+print(keys(pairs2))
