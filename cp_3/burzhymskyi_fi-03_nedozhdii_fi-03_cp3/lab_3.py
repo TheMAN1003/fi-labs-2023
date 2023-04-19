@@ -62,6 +62,22 @@ def keys(pairs):
     return key
 
 
+def encode(code, a, b, alph):
+    text = ""
+    m = len(alph)
+    (d, a, _) = extended_gcd(a, m**2)
+    if d != 1:
+        return text
+    i = 0
+    while i < len(code) - 1:
+        x = a*(cb(code[i]+code[i+1], alph) - b) % m**2
+        x2 = x % m
+        x1 = int((x-x2)/m)
+        text += alph[x1]+alph[x2]
+        i += 2
+    return text
+
+
 pairs1 = splitOnPairs(M_bi, C_test, alph1)
 print(pairs1)
 print(len(pairs1))
@@ -70,5 +86,9 @@ pairs2 = splitOnPairs(M_bi, C_test, alph2)
 print(pairs2)
 print(len(pairs2))
 
-print(keys(pairs1))
-print(keys(pairs2))
+k1 = keys(pairs1)
+
+k2 = keys(pairs2)
+
+
+
