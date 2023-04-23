@@ -78,17 +78,17 @@ def decode(code, a, b, alph):
     return text
 
 
-pairs1 = splitOnPairs(M_bi, C_test1, alph1)
+pairs1 = splitOnPairs(M_bi, C_test, alph1)
 print(pairs1)
 print(len(pairs1))
 
-pairs2 = splitOnPairs(M_bi, C_test1, alph2)
+pairs2 = splitOnPairs(M_bi, C_test, alph2)
 print(pairs2)
 print(len(pairs2))
 
 k1 = keys(pairs1)
 print(k1)
-code1 = "эяярэфщкхрстилхфюуцыулнрпяшзрыюуылызцзлглдывэяпщщнив"
+code1 = "эяярэфщкхрстилхфюуцыулнрпяшзрыюуылызцзлглдывэяпщщнивоооооо"
 
 for k in k1:
     print(decode(code1, k[0], k[1], alph1))
@@ -96,4 +96,45 @@ for k in k1:
 k2 = keys(pairs2)
 print(k2)
 
+def checkMeaningful(text):
+    # о а е ф щ ь
+    p = {'а': 0, 'б': 0, 'в': 0, 'г': 0, 'д': 0, 'е': 0,
+         'ж': 0, 'з': 0, 'и': 0, 'й': 0, 'к': 0, 'л': 0,
+         'м': 0, 'н': 0, 'о': 0, 'п': 0, 'р': 0, 'с': 0,
+         'т': 0, 'у': 0, 'ф': 0, 'х': 0, 'ц': 0, 'ч': 0,
+         'ш': 0, 'щ': 0, 'ы': 0, 'ь': 0, 'э': 0,
+         'ю': 0, 'я': 0}
+    for letter in text:
+        p[letter] += 1
+    for i in p:
+        p[i] /= len(text)
+    i = 0
+    bigrams = {}
+    while i < len(text) - 1:
+        bi = text[i] + text[i+1]
+        if bi in bigrams.keys():
+            bigrams[bi] += 1
+        else:
+            bigrams[bi] = 1
+        i += 2
+    for i in bigrams:
+        bigrams[i] /= len(bigrams)
+    if p['ф'] < 0.004 and p['щ'] < 0.004 and p['ь'] < 0.012 and p['о'] > 0.1 and p['а'] > 0.06 and p['е'] > 0.08 :
+        if bigrams["ст"] > 0.09 and bigrams["но"] > 0.05 and bigrams["то"] > 0.04 and bigrams["на"] > 0.02 and bigrams["ен"] > 0.06 :
+            print(text)
+            print("next")
 
+
+def searchThroughKeys(text, keys, alphabet):
+    texts = []
+    for k in keys:
+        texts.append(decode(text, k[0], k[1], alphabet))
+    for text in texts:
+        checkMeaningful(text)
+
+with open('C:\\Users\\nedoz\\PycharmProjects\\fi-labs-2023\\tasks\\sym_crypto_cp_3\\for_test.utf8\\V3', 'r', encoding="utf8") as f:
+    text = f.read()
+
+searchThroughKeys(text, k1, alph1)
+
+searchThroughKeys(text, k2, alph2)
