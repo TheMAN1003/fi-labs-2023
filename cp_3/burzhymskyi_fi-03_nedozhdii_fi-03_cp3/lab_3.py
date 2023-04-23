@@ -26,7 +26,7 @@ alph2 = "абвгдежзийклмнопрстуфхцчшщьыэюя"
 
 M_bi = ["ен", "на", "то", "но", "ст"]
 C_test = ["ыя", "йз", "хф", "хр", "ыв"]
-
+C_test1 = ["еш", "шя", "еы", "до", "зо"]
 
 def cb(bigram, alphabet):
     n = len(alphabet)
@@ -47,7 +47,7 @@ def splitOnPairs(list1, list2, alph):
     return listOfPairs
 
 
-def solve_system(x1, x2, y1, y2, mod):
+def solve_system(x1, y1, x2, y2, mod):
     (_, r, _) = extended_gcd(x1 - x2, mod)
     a = (r * (y1 - y2)) % mod
     b = (y1 - a * x1) % mod
@@ -62,7 +62,7 @@ def keys(pairs):
     return key
 
 
-def encode(code, a, b, alph):
+def decode(code, a, b, alph):
     text = ""
     m = len(alph)
     (d, a, _) = extended_gcd(a, m**2)
@@ -78,17 +78,22 @@ def encode(code, a, b, alph):
     return text
 
 
-pairs1 = splitOnPairs(M_bi, C_test, alph1)
+pairs1 = splitOnPairs(M_bi, C_test1, alph1)
 print(pairs1)
 print(len(pairs1))
 
-pairs2 = splitOnPairs(M_bi, C_test, alph2)
+pairs2 = splitOnPairs(M_bi, C_test1, alph2)
 print(pairs2)
 print(len(pairs2))
 
 k1 = keys(pairs1)
+print(k1)
+code1 = "эяярэфщкхрстилхфюуцыулнрпяшзрыюуылызцзлглдывэяпщщнив"
+
+for k in k1:
+    print(decode(code1, k[0], k[1], alph1))
 
 k2 = keys(pairs2)
-
+print(k2)
 
 
