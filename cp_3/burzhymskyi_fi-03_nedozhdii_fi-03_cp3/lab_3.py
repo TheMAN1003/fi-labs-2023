@@ -25,8 +25,7 @@ alph1 = "абвгдежзийклмнопрстуфхцчшщыьэюя"
 alph2 = "абвгдежзийклмнопрстуфхцчшщьыэюя"
 
 M_bi = ["ен", "на", "то", "но", "ст"]
-C_test = ["ыя", "йз", "хф", "хр", "ыв"]
-C_test1 = ["еш", "шя", "еы", "до", "зо"]
+C_var = ["кд", "щю", "во", "рб", "тд"]
 
 def cb(bigram, alphabet):
     n = len(alphabet)
@@ -78,63 +77,49 @@ def decode(code, a, b, alph):
     return text
 
 
-pairs1 = splitOnPairs(M_bi, C_test, alph1)
-print(pairs1)
-print(len(pairs1))
+def N(Y,t):
+    k = 0
+    for i in Y:
+        if i == t:
+            k += 1
+    return k
 
-pairs2 = splitOnPairs(M_bi, C_test, alph2)
-print(pairs2)
-print(len(pairs2))
 
-k1 = keys(pairs1)
-print(k1)
-code1 = "эяярэфщкхрстилхфюуцыулнрпяшзрыюуылызцзлглдывэяпщщнивоооооо"
-
-for k in k1:
-    print(decode(code1, k[0], k[1], alph1))
-
-k2 = keys(pairs2)
-print(k2)
-
-def checkMeaningful(text):
-    # о а е ф щ ь
-    p = {'а': 0, 'б': 0, 'в': 0, 'г': 0, 'д': 0, 'е': 0,
-         'ж': 0, 'з': 0, 'и': 0, 'й': 0, 'к': 0, 'л': 0,
-         'м': 0, 'н': 0, 'о': 0, 'п': 0, 'р': 0, 'с': 0,
-         'т': 0, 'у': 0, 'ф': 0, 'х': 0, 'ц': 0, 'ч': 0,
-         'ш': 0, 'щ': 0, 'ы': 0, 'ь': 0, 'э': 0,
-         'ю': 0, 'я': 0}
-    for letter in text:
-        p[letter] += 1
-    for i in p:
-        p[i] /= len(text)
-    i = 0
-    bigrams = {}
-    while i < len(text) - 1:
-        bi = text[i] + text[i+1]
-        if bi in bigrams.keys():
-            bigrams[bi] += 1
-        else:
-            bigrams[bi] = 1
-        i += 2
-    for i in bigrams:
-        bigrams[i] /= len(bigrams)
-    if p['ф'] < 0.004 and p['щ'] < 0.004 and p['ь'] < 0.012 and p['о'] > 0.1 and p['а'] > 0.06 and p['е'] > 0.08 :
-        if bigrams["ст"] > 0.09 and bigrams["но"] > 0.05 and bigrams["то"] > 0.04 and bigrams["на"] > 0.02 and bigrams["ен"] > 0.06 :
-            print(text)
-            print("next")
+def IoC(Y, alphabet):
+    k = 0
+    n = len(Y)
+    for t in alphabet:
+        tmp = N(Y,t)
+        k += (tmp * (tmp - 1))
+    k = float(k / (n * (n - 1)))
+    return k
 
 
 def searchThroughKeys(text, keys, alphabet):
     texts = []
+    I_normal = 0.059
     for k in keys:
         texts.append(decode(text, k[0], k[1], alphabet))
+    j = 0
     for text in texts:
-        checkMeaningful(text)
+        if text != '':
+            index = IoC(text, alphabet)
+            if abs(index - I_normal) < 0.001:
+                print(keys[j][0], keys[j][1])
+                print(index)
+                print(text)
+        j += 1
 
-with open('C:\\Users\\nedoz\\PycharmProjects\\fi-labs-2023\\tasks\\sym_crypto_cp_3\\for_test.utf8\\V3', 'r', encoding="utf8") as f:
-    text = f.read()
 
-searchThroughKeys(text, k1, alph1)
+varpairs1 = splitOnPairs(M_bi, C_var, alph1)
+varpairs2 = splitOnPairs(M_bi, C_var, alph2)
 
-searchThroughKeys(text, k2, alph2)
+vark1 = keys(varpairs1)
+vark2 = keys(varpairs2)
+
+with open('03.txt', 'r', encoding="utf8") as f:
+    vartext = f.read()
+vartext = vartext.replace('\n', '')
+
+searchThroughKeys(vartext, vark1, alph1)
+searchThroughKeys(vartext, vark2, alph2)
