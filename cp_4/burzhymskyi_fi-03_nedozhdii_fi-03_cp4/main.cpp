@@ -30,7 +30,37 @@ u_int64_t F(u_int64_t &x, u_int64_t& y, u_int64_t& s)
     return (s & x) ^ ((1 ^ s) & y);
 }
 
+//const int wt[256] = [0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+//                     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+//                     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+//                     ]
+
+const int wt8[256] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
+
 u_int16_t R(vector<uint64_t> x, vector<uint64_t> z)
+{
+    vector<uint64_t> tmp(x.size());
+    if(x.size() != z.size())
+    {
+        std::cout<<"prblem\n\n";
+    }
+    for(size_t i = 0; i < x.size(); ++i)
+    {
+        tmp[i] = x[i] ^ z[i];
+    }
+
+    u_int16_t R = 0;
+    for (int k = 0; k < tmp.size(); ++k)
+    {
+        for (int i = 0; i < 64; i += 8)
+        {
+            R += wt8[(tmp[k] >> i) & (255)];
+        }
+    }
+    return R;
+}
+
+u_int16_t R1(vector<uint64_t> x, vector<uint64_t> z)
 {
     vector<uint64_t> tmp(x.size());
     if(x.size() != z.size())
@@ -52,6 +82,31 @@ u_int16_t R(vector<uint64_t> x, vector<uint64_t> z)
     }
     return R;
 }
+
+u_int16_t R2(vector<uint64_t> x, vector<uint64_t> z, vector<int>& wt)
+{
+    vector<uint64_t> tmp(x.size());
+    if(x.size() != z.size())
+    {
+        std::cout<<"prblem\n\n";
+    }
+    for(size_t i = 0; i < x.size(); ++i)
+    {
+        tmp[i] = x[i] ^ z[i];
+    }
+
+    u_int16_t R = 0;
+    for (int k = 0; k < tmp.size(); ++k)
+    {
+        for (int i = 0; i < 64; i += 16)
+        {
+            R += wt[(tmp[k] >> i) & (65535)];
+        }
+    }
+    return R;
+}
+
+
 
 
 void takeN(vector<u_int64_t> &z, int N)
@@ -99,82 +154,116 @@ void buildX(vector<u_int64_t> &x, const int& N, u_int64_t u)
         L1(u, x0);
         tmp ^= x0 << (63 - i%64);
         //std::cout<<x0;
-
-
     }
     //std::cout<<"\n";
     if(x.size() != ceil(double(N)/double(64)))
         x.push_back(tmp);
 
-//    for(auto f: x)
-//    {
-//        std::cout<< f<<' ';
-//    }
-//    std::cout<<"\n\n";
+}
+
+void buildY(vector<u_int64_t> &x, const int& N, u_int64_t u)
+{
+    u_int64_t tmp = 0;
+    u_int64_t x0 = 0;
+    //std::cout<<"x0:\n";
+    L2(u, x0);
+    tmp ^= x0 << 63 ;
+    //std::cout<<x0;
+    for(int i = 1; i < N; ++i)
+    {
+        if(i % 64 == 0 )
+        {
+            //std::cout<<" ";
+            x.push_back(tmp);
+            tmp=0;
+        }
+        L1(u, x0);
+        tmp ^= x0 << (63 - i%64);
+        //std::cout<<x0;
+    }
+    //std::cout<<"\n";
+    if(x.size() != ceil(double(N)/double(64)))
+        x.push_back(tmp);
+
+}
+
+void buildWt(std::vector<int>& wt)
+{
+    for(int i = 0; i < 65536; ++i)
+    {
+        int m =0;
+        for(int j = 0; j < 16; ++j)
+        {
+            m += ((i>>j)&1);
+        }
+        wt.push_back(m);
+    }
 }
 
 
 
 int main()
 {
-    u_int64_t t = 1<<30;
+    u_int64_t t1 = (u_int64_t)1<<30;
+    u_int64_t t2 = (u_int64_t)1<<31;
     std::vector<std::string> vec;
-    int C = 81;
-    int N = 258;
-
+    int C1 = 81;
+    int N1 = 258;
+    int C2 = 83;
+    int N2 = 265;
     int d = 1;
+    vector<int> wt;
+    buildWt(wt);
+
     vector<u_int64_t> z;
 
-    takeN(z,N);
+    takeN(z,N1);
 
-    for(int i =0 ;i < z.size(); ++i)
-    {
-        cout<<z[i]<<' ';
-    }
-    std::cout<<"\n";
     vector<u_int64_t> candidatesL1;
 
-    vector<u_int64_t> x;
-    u_int64_t b =1;
-
-//    buildX(x, N, 5724344);
-//    int r = R(x, z);
-//    std::cout<<r;
-
-
-//    for(int i = 0; i < 64; ++i)
-//    {
-//        u_int64_t x0 = 0 ;
-//        L1(b,x0);
-//        std::cout<<i<<":"<<x0<<"\n";
-//    }
-
-//    buildX(x, N, 5724344);
-//    int r = R(x, z);
-//    std::cout<<r<<' ';
 
     #pragma omp parallel for
-    for(u_int64_t i = 0; i <t; ++i)
+    for(u_int64_t i = 0; i <t1; ++i)
     {
         vector<u_int64_t> x;
-        buildX(x, N, i);
-        int r = R(x, z);
-        //std::cout<<'\n'<<i<<" "<<r<<'\n';
+        buildX(x, N1, i);
+//        int r = R(x, z);
+//        int r2 = R2(x,z,wt);
+        int r = R1(x,z);
 
-        if(r<C)
+        //std::cout<<'\n'<<i<<" "<<r<<'\n';
+        if(r<C1)
         {
-            std::cout<<'\n'<<i<<" "<<r<<'\n';
-            std::cout<<"done";
+            candidatesL1.push_back(i);
+            //std::cout<<'\n'<<i<<" "<<r<<'\n';
+            std::cout<<'\n'<<i<<" "<<candidatesL1.size()<<'\n';
+        }
+    }
+    vector<u_int64_t> z2;
+    takeN(z2,N2);
+
+
+    vector<u_int64_t> candidatesL2;
+    #pragma omp parallel for
+    for(u_int64_t i = 0; i < t2; ++i)
+    {
+        vector<u_int64_t> x;
+        buildY(x, N2, i);
+        int r = R(x, z);
+
+        //std::cout<<'\n'<<i<<" "<<r<<'\n';
+        if(r<C2)
+        {
+            candidatesL2.push_back(i);
+            //std::cout<<'\n'<<i<<" "<<r<<'\n';
+            std::cout<<'\n'<<i<<" "<<candidatesL2.size()<<'\n';
         }
     }
 
 
-//    #pragma omp parallel for
-//    for (u_int64_t i=0; i < t; ++i)
-//    {
-//        //std::cout<<i<<'\n';
-//        d+=1;
-//    }
+
+
+
     std::cout<<"done";
 }
 
